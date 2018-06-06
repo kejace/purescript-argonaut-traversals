@@ -9,7 +9,7 @@ import Control.Monad.Rec.Class (class MonadRec)
 
 import Data.Argonaut.JCursor (JCursor(..))
 import Data.Char as C
-import Data.String as S
+import Data.String.CodeUnits (fromCharArray)
 
 genJCursor :: forall m. MonadGen m => MonadRec m => Lazy (m JCursor) => m JCursor
 genJCursor = Gen.resize (min 10) $ Gen.sized genJCursor'
@@ -19,5 +19,5 @@ genJCursor = Gen.resize (min 10) $ Gen.sized genJCursor'
     | otherwise = pure JCursorTop
   genField = JField <$> genString <*> defer \_ -> genJCursor
   genIndex = JIndex <$> Gen.chooseInt 0 1000 <*> defer \_ -> genJCursor
-  genString = S.fromCharArray <$> Gen.unfoldable genChar
+  genString = fromCharArray <$> Gen.unfoldable genChar
   genChar = C.fromCharCode <$> Gen.chooseInt 0 65535
